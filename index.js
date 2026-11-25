@@ -3,24 +3,23 @@ import express from "express";
 import cors from "cors";
 import { connectMongoDb } from "./config/db.js";
 
-const port = process.env.PORT;
 const app = express();
 const clientUrl = process.env.BASE_URL_CLIENT;
-
-app.use(express.json())
+const port = process.env.PORT;
 
 app.use(cors({
     origin: clientUrl
 }))
+app.use(express.json())
 
-app.get("/todos", async (req, res, next) => {
+app.get("/todos", async(req, res, next) => {
     try{
-        const db = await connectMongoDb();
-        const todos = await db.collection("todos").find().toArray();
+        const cursor = await connectMongoDb();
+        const todos = await cursor.collection("todos").find().toArray();
         res.json(todos);
     }
     catch(error){
-        throw error;
+        next(error)
     }
 })
 
